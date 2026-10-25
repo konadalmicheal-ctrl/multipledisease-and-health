@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block title %}{{ code }} | Aarogya{% endblock %}{% block content %}<section class="error-page"><span class="eyebrow">{{ code }} ERROR</span><h1>Oops, something went off track.</h1><p>{{ message }}</p><a class="btn primary" href="{{ url_for('index') }}">Return home →</a></section>{% endblock %}

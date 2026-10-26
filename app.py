@@ -254,22 +254,14 @@ def forbidden(_): return render_template('error.html', code=403, message='You do
 def not_found(_): return render_template('error.html', code=404, message='The page you requested was not found.'), 404
 
 with app.app_context():
-   admin_email = os.environ.get('ADMIN_EMAIL', '').strip().lower()
-admin_password = os.environ.get('ADMIN_PASSWORD', '')
+ db.create_all()
+    # Optional first admin account. Set both environment variables before first launch.
+    admin_email=os.environ.get('ADMIN_EMAIL','').strip().lower()
+    admin_password=os.environ.get('ADMIN_PASSWORD','')
+    if admin_email and admin_password and not User.query.filter_by(email=admin_email).first():
+        db.session.add(User(name='Administrator', email=admin_email, password_hash=generate_password_hash(admin_password), role='admin'))
+        db.session.commit()
 
-if admin_email and admin_password:
-    admin_user = User.query.filter_by(email=admin_email).first()
-
-    if admin_user:
-        admin_user.role = 'admin'
-        admin_user.password_hash = generate_password_hash(admin_password)
-    else:
-        admin_user = User(
-            name='Administrator',
-            email=admin_email,
-            password_hash=generate_password_hash(admin_password),
-            role='admin'
-        )
-        db.session.add(admin_user)
-
-    db.session.commit() 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)
+ 
